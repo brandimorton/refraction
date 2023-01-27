@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lil 3 guy</title>
+    <link rel="stylesheet" href="refractionTest.css">
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.148.0/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+
+        const torusGeo = new THREE.TorusGeometry( 4, .18, 50, 100 );
+        const torusMat = new THREE.MeshBasicMaterial( { color: 0x1c1c1c } );
+        const torus = new THREE.Mesh( torusGeo, torusMat );
+        torus.renderOrder = 100;
+        torus.rotation.set( 0, 0, 30 * Math.PI / 180 );
+        scene.add( torus );
+
+        const sphereMat = new THREE.MeshPhysicalMaterial( { color: 0xffffff, transmission: .9, opacity: .05, roughness: 0, thickness: 4 } );
+        const sphereGeo = new THREE.SphereGeometry( 3.8, 50, 50 );
+        const sphere = new THREE.Mesh ( sphereGeo, sphereMat );
+        sphere.scale.set( 1, 1, .35 );
+        sphere.renderOrder = 10;
+        torus.add( sphere );
+
+        const cylinderGeo = new THREE.CylinderGeometry( .5 , .5, 7, 20 );
+        const cylinderMat = torusMat;
+        const cylinder = new THREE.Mesh ( cylinderGeo, cylinderMat );
+        cylinder.position.set( 0, -7.5, 0 );
+        cylinder.scale.set( 1, 1, .5 );
+        torus.add( cylinder );
+
+        const planeHeight = 33;
+        new THREE.TextureLoader().load( "waldo.jpeg", function( texture ) {
+          const aspect = texture.image.naturalWidth / texture.image.naturalHeight;
+          const planeWidth = planeHeight * aspect;
+          const planeGeo = new THREE.PlaneGeometry( planeWidth, planeHeight );
+          const slimeMat = new THREE.MeshBasicMaterial( { map: texture } )
+          const plane = new THREE.Mesh( planeGeo, slimeMat );
+          plane.position.set( 0, 0, -6 );
+          scene.add( plane );
+      });
+
+        const directionalLight = new THREE.DirectionalLight( 0xffffff, .8 );
+        const directionalLight2 = new THREE.DirectionalLight( 0xffffff, .8 );
+        const directionalLight3 = new THREE.DirectionalLight( 0xffffff, .8);
+        scene.add( directionalLight, directionalLight2, directionalLight3 );
+        directionalLight.position.set( 0, 0, 1 );
+        directionalLight2.position.set( 1, 0, 2 );
+        directionalLight3.position.set( 0, 1, 0 );
+
+        camera.position.z = 15;
+
+        mouseX = 0;
+        mouseY = 0;
+        window.addEventListener( "mousemove", ( event ) => {
+          mouseX = ( event.clientX - window.innerWidth / 2 ) / ( window.innerHeight / 2 ) ; 
+          mouseY = - ( event.clientY - window.innerHeight / 2) / (window.innerHeight / 2 );
+          console.log( mouseX , mouseY );
+        } );
+
+        function animate() {
+            requestAnimationFrame( animate );
+            renderer.render( scene, camera );
+            const screenHeight = 25;
+            torus.position.set( mouseX * screenHeight / 2, mouseY * screenHeight / 2, 0 )
+            
+        }
+        animate();
+    </script>
+  </body>
+</html>
